@@ -1,47 +1,75 @@
 import pygame
-from Player import Player
+from Player import Player, Image
+JUMPLIMIT = 2
+
 
 class Stage:
     width = 1200
     height = 700
     FPS = 30
     fpsClock = pygame.time.Clock()
-
-    Stage = pygame.display.set_mode((width, height))
-
-    pygame.display.set_caption('M2Beat')
     player = None
 
     def __init__(self):
+        pygame.init()
         pygame.display.set_caption("M2Beat")
         self.stage = pygame.display.set_mode((self.width, self.height))
         self.stage.fill((0, 0, 0))
         self.player = Player(self.stage, self.width, self.height)
+        self.count = 0 #점프한 횟수(K_UP누른 횟수)
+        self.load_slime()
+        self.slime = Image('resources/images/slime.png')
+
+    def press_any_key(self):
+        start = False
+        while not start:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    start = True
+
+    def draw_text(self, text, size, color, x, y):
+        font = pygame.font.Font('freesansbold.ttf', size)
+        text_suface = font.render(text, True, color)
+        text_rect = text_suface.get_rect()
+        text_rect.midtop = (x, y)
+        self.stage.blit(text_suface, text_rect)
+
+    def start_screen(self):
+        self.stage.fill((0, 0, 0))
+        self.draw_text("PRESS ANY KEY", 90, (255, 255, 255), self.width/2, self.height/2)
+        pygame.display.update()
+        self.press_any_key()
 
     class Ground:
         def __init__(self, stage, x, y, w, h):
             self.stage = stage
-            self.image = pygame.Surface((w, h))
-            self.image.fill((0, 255, 0))
-            self.rect = self.image.get_rect()
-            self.rect.x = x
-            self.rect.y = y
-            self.stage.blit(self.image, (self.rect.x, self.rect.y))
+            self.ground_image = pygame.Surface((w, h))
+            self.ground_image.fill((0, 255, 0))
+            self.x = x
+            self.y = y
+            self.stage.blit(self.ground_image, (self.x, self.y))
 
+    def update(self):
+        self.stage.fill((0, 0, 0))
+        self.player.move()
+        self.Ground(self.stage, 0, self.height - 50, self.width, 50)
 
     def start(self):
         finish = False
-        while not finish :
+        while not finish:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     finish = True
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP and self.count < JUMPLIMIT:
+                        self.player.jump()
+                        self.count += 1
+                    elif self.count == JUMPLIMIT:
+                        self.count = 0
+            self.update()
             pygame.display.update()
-
-            self.Ground(self.stage, 0, self.height - 50, self.width, 50)
-            self.player.move()
-            pygame.display.update()
-
 
 
 game = Stage()
+#game.start_screen()
 game.start()

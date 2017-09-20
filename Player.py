@@ -1,52 +1,83 @@
 import pygame
 vec = pygame.math.Vector2
+PLAYER_ACC = 0.1
+PLAYER_FRICTION = -0.08
+PLAYER_GRAV = 0.3
 
 
-class Player :
+class Image:
+    def __init__(self, filename):
+        self.cut_image = pygame.image.load(filename).convert()
+
+    def get_image(self, x, y, w, h):
+        image = pygame.Surface((w, h))
+        image.blit(self.cut_image, (0, 0), (x, y, w, h))
+        return image
+
+
+class Player:
     def __init__(self, stage, width, height):
         self.stage = stage
+        self.walking = True
+        self.jumping = False
+        self.current_frame = 0
+        self.last_update = 0
+        self.load_image()
         self.width = width
         self.height = height
-        self.image = pygame.Surface((30, 30))
-        self.image.fill((0, 0, 255))
+        self.image = self.walk_frame[0]
         self.rect = self.image.get_rect()
         self.rect.center = (self.width/2, self.height/2)
-        self.pos = vec(0, self.height-50)
+        self.pos = vec(100, self.height - 80)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
-        self.black = pygame.Surface((30, 30))
-        self.black.fill((0,0,0))
+        self.walk_frame = None
+        self.jump_frame = None
+
+    def load_image(self):
+        self.walk_frame = [self.stage.slime.get_image(0, 0, 30, 40),
+                           self.stage.slime.get_image(30, 0, 30, 40)]
+        self.jump_frame = [self.stage.slime.get_image(60, 0, 30, 40),
+                           self.stage.slime.get_imgae(90, 0, 30, 40)]
 
     def jump(self):
         self.vel.y = -10
 
-    def move(self):
-        self.acc = vec(0, 0.5)
-        pressed = pygame.key.get_pressed()
-        keydown = pygame.KEYDOWN
-        if keydown == pygame.K_UP:
-            self.jump()
-        if pressed[pygame.K_DOWN]:
-            pass
-        if pressed[pygame.K_RIGHT]:
-            self.acc.x = 0.35
-        if pressed[pygame.K_LEFT]:
-            self.acc.x = -0.35
+    def animate(self):
+        now = pygame.time.get_ticks()
 
-        self.acc.x += self.vel.x * (-0.08)
+        if self.walking:
+            if now - self.last_update > 120:
+                self.last_update = now
+                self.current_frame = (self.current_frame + 1) % len(self.walk_frame)
+            if self.vel.y != 0:
+                self.jumping = True
+
+        if self.jumping:
+            if now - self.last_update > 150:
+                self.last_update = now
+                self.current_frame = (self.current_frame + 1) % 1
+                self.image = self.jump_frame
+
+    def draw(self):
+        self.stage.blit(self.image, (self.pos.x, self.pos.y))
+
+    def move(self):
+        self.acc = vec(0, PLAYER_GRAV)
+        pressed = pygame.key.get_pressed()
+        if pressed[pygame.K_RIGHT]:
+            pass
+        if pressed[pygame.K_LEFT]:
+            pass
+
+        self.acc.x += self.vel.x * PLAYER_FRICTION
         self.vel += self.acc
-        self.pos += self.vel + 0.5 * self.acc
+        self.pos += self.vel + PLAYER_GRAV * self.acc
+
+        if self.pos.y > self.height - 80:
+            self.pos.y = self.height - 80
 
         self.rect.midbottom = self.pos
 
-        if self.pos.x > self.width:
-            self.pos.x = 0
-        if self.pos.x < 0:
-            self.pos.x = self.width
-            self.stage.blit(self.black, (0, self.pos.y))
-        if self.pos.y > self.height - 50:
-            self.pos.y = self.height - 80
-
         self.stage.blit(self.image, (self.pos.x, self.pos.y))
-        self.stage.blit(self.black, (self.pos.x - 30, self.pos.y))
-        self.stage.blit(self.black, (self.pos.x + 30, self.pos.y))
+
