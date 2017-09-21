@@ -1,5 +1,5 @@
 import pygame
-from Player import Player, Image
+from Player import Player
 JUMPLIMIT = 2
 
 
@@ -17,8 +17,6 @@ class Stage:
         self.stage.fill((0, 0, 0))
         self.player = Player(self.stage, self.width, self.height)
         self.count = 0 #점프한 횟수(K_UP누른 횟수)
-        self.load_slime()
-        self.slime = Image('resources/images/slime.png')
 
     def press_any_key(self):
         start = False
@@ -71,5 +69,5 @@ class Stage:
 
 
 game = Stage()
-#game.start_screen()
+game.start_screen()
 game.start()
