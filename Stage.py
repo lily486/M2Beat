@@ -1,4 +1,4 @@
-import pygame
+import pygame, random
 from Player import Player
 JUMPLIMIT = 2 #점프 한도
 
@@ -9,13 +9,21 @@ class Stage:
     FPS = 30
     fpsClock = pygame.time.Clock()
     player = None
+    background = pygame.image.load('resources/images/backgroundCutResized.png')
+    ground = pygame.image.load('resources/images/ground.png')
+    cloud_list = [pygame.image.load('resources/images/cloud1.png'),
+                  pygame.image.load('resources/images/cloud2.png'),
+                  pygame.image.load('resources/images/cloud3.png'),
+                  pygame.image.load('resources/images/cloud4.png')]
+    clouds = []
+    cloud_count = 1
 
     def __init__(self):
         pygame.init()
         pygame.display.set_caption("M2Beat")
         self.stage = pygame.display.set_mode((self.width, self.height))
-        self.stage.fill((0, 0, 0)) #배경 색
-        self.player = Player(self.stage, self.width, self.height)
+        self.stage.blit(self.background, (0, 0)) #배경 색
+        self.player = Player(self.stage, self.ground, self.width, self.height)
         self.count = 0 #점프한 횟수(K_UP누른 횟수)
 
     def press_any_key(self):
@@ -33,24 +41,45 @@ class Stage:
         self.stage.blit(text_suface, text_rect)
 
     def start_screen(self): #시작화면
-        self.stage.fill((0, 0, 0))
+        self.stage.blit(self.background, (0, 0))
         self.draw_text("PRESS ANY KEY", 90, (255, 255, 255), self.width/2, self.height/2)
         pygame.display.update()
         self.press_any_key()
 
-    class Ground: #플레이화면에서 땅(녹색)
-        def __init__(self, stage, x, y, w, h):
+    class Cloud:
+        def __init__(self, stage, cloud, width, y):
             self.stage = stage
-            self.ground_image = pygame.Surface((w, h))
-            self.ground_image.fill((0, 255, 0))
+            self.cloud = cloud
+            self.x = width
+            self.y = y
+            self.speed = 4
+
+        def move(self):
+            self.x -= self.speed
+            self.stage.blit(self.cloud, (self.x, self.y))
+
+    class Ground: #플레이화면에서 땅
+        def __init__(self, stage, ground, x, y):
+            self.stage = stage
+            self.ground_image = ground
             self.x = x
             self.y = y
             self.stage.blit(self.ground_image, (self.x, self.y))
+            self.stage.blit(self.ground_image, (self.x + self.ground_image.get_width(), self.y))
 
     def update(self): #플레이어 움직일 때 잔상 안남게 + 플레이어 움직임
-        self.stage.fill((0, 0, 0))
+        self.stage.blit(self.background, (0, 0))
+        self.Ground(self.stage, self.ground, 0, self.height - self.ground.get_height())
         self.player.move()
-        self.Ground(self.stage, 0, self.height - 50, self.width, 50)
+        self.cloud_count -= 1
+        if self.cloud_count == 0:
+            cloud = self.Cloud(self.stage, self.cloud_list[random.randint(0, 3)], self.width, random.randint(0, 100))
+            self.clouds.append(cloud)
+            self.cloud_count = 120  # cloud_count가 작아지면 구름 갯수가 많아짐
+        for cloud in self.clouds:
+            cloud.move()
+        if self.clouds[0].x == 0:
+            self.clouds.pop()
 
     def start(self):
         finish = False
@@ -63,10 +92,11 @@ class Stage:
                         self.player.jump()
                         self.count += 1
                     elif self.count == JUMPLIMIT:
-                        self.count = 0
+                        if self.player.pos.y == self.height - self.ground.get_height() - self.player.image.get_height() + 1:
+                            self.count = 0
+            self.player.move()
             self.update()
             pygame.display.update()
-
 
 game = Stage()
 game.start_screen()
