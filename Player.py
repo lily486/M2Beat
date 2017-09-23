@@ -6,8 +6,6 @@ PLAYER_GRAV = 0.3  # 중력
 
 pygame.display.set_mode((1200, 700))
 
-pygame.display.set_mode((1200, 700))
-
 
 class Player:
     def __init__(self, stage, ground,  width, height):
