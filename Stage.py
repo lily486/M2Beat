@@ -1,7 +1,7 @@
 import pygame, random
 from Player import Player
+#from time import sleep
 JUMPLIMIT = 2 #점프 한도
-
 
 class Stage:
     width = 1200 #가로
@@ -15,8 +15,8 @@ class Stage:
                   pygame.image.load('resources/images/cloud2.png'),
                   pygame.image.load('resources/images/cloud3.png'),
                   pygame.image.load('resources/images/cloud4.png')]
-    clouds = []
     cloud_count = 1
+    clouds = []
 
     def __init__(self):
         pygame.init()
@@ -24,7 +24,7 @@ class Stage:
         self.stage = pygame.display.set_mode((self.width, self.height))
         self.stage.blit(self.background, (0, 0)) #배경 색
         self.player = Player(self.stage, self.ground, self.width, self.height)
-        self.count = 0 #점프한 횟수(K_UP누른 횟수)
+        self.count = 0  # 점프한 횟수(K_UP누른 횟수)
 
     def press_any_key(self):
         start = False
@@ -33,7 +33,7 @@ class Stage:
                 if event.type == pygame.KEYDOWN:
                     start = True
 
-    def draw_text(self, text, size, color, x, y): #시작화면 텍스트 만들 때 사용
+    def draw_text(self, text, size, color, x, y):  # 시작화면 텍스트 만들 때 사용
         font = pygame.font.Font('freesansbold.ttf', size)
         text_suface = font.render(text, True, color)
         text_rect = text_suface.get_rect()
@@ -52,13 +52,13 @@ class Stage:
             self.cloud = cloud
             self.x = width
             self.y = y
-            self.speed = 4
+            self.speed = 8
 
         def move(self):
             self.x -= self.speed
             self.stage.blit(self.cloud, (self.x, self.y))
 
-    class Ground: #플레이화면에서 땅
+    class Ground:  # 플레이화면에서 땅
         def __init__(self, stage, ground, x, y):
             self.stage = stage
             self.ground_image = ground
@@ -67,7 +67,7 @@ class Stage:
             self.stage.blit(self.ground_image, (self.x, self.y))
             self.stage.blit(self.ground_image, (self.x + self.ground_image.get_width(), self.y))
 
-    def update(self): #플레이어 움직일 때 잔상 안남게 + 플레이어 움직임
+    def update(self):  # 플레이어 움직일 때 잔상 안남게 + 플레이어 움직임
         self.stage.blit(self.background, (0, 0))
         self.Ground(self.stage, self.ground, 0, self.height - self.ground.get_height())
         self.player.move()
@@ -75,11 +75,11 @@ class Stage:
         if self.cloud_count == 0:
             cloud = self.Cloud(self.stage, self.cloud_list[random.randint(0, 3)], self.width, random.randint(0, 100))
             self.clouds.append(cloud)
-            self.cloud_count = 120  # cloud_count가 작아지면 구름 갯수가 많아짐
+            self.cloud_count = 70  # cloud_count가 작아지면 구름 갯수가 많아짐
         for cloud in self.clouds:
             cloud.move()
-        if self.clouds[0].x == 0:
-            self.clouds.pop()
+        if self.clouds[0].x == -350:
+            self.clouds.pop(-(len(self.cloud_list))-1)
 
     def start(self):
         finish = False
