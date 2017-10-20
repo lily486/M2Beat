@@ -1,8 +1,9 @@
 import pygame
+from Image import Image
 vec = pygame.math.Vector2
 PLAYER_ACC = 0.1  # 가속
 PLAYER_FRICTION = -0.08  # 마찰
-PLAYER_GRAV = 0.5  # 중력
+PLAYER_GRAV = 0.3  # 중력
 
 pygame.display.set_mode((1200, 700))
 
@@ -26,18 +27,10 @@ class Player:
         self.warrior4 = self.warrior4_frame[0]
         self.rect = self.image.get_rect()
         self.pos = vec(250, 1200 - 86 - 48 + 4)  # 플레이어 시작 위치 (가로, 세로(=bottomlimit이랑 일치하게))
+        self.x = 250
         self.vel = vec(0, 0)  # 속도계산
         self.acc = vec(0, 0)  # 가속계산
         self.ground_height = ground.get_height()
-
-    class Image:  # 이미지 불러오기
-        def __init__(self, filename):
-            self.cut_image = pygame.image.load(filename).convert_alpha()
-
-        def get_image(self, x, y, w, h):
-            image = pygame.Surface((w, h), pygame.SRCALPHA)  # pygame.SRCALPHA -> png파일 배경 투명하게
-            image.blit(self.cut_image, (0, 0), (x, y, w, h))  # (x, y)좌표가 lefttop이고, (w, h)만한 크기로 자르기
-            return image
 
     slime = Image('resources/images/Slime4.png')  # 슬라임이미지 불러오기
     warrior_img = Image('resources/images/warrior_partyResized.png')
@@ -127,3 +120,16 @@ class Player:
         self.stage.blit(self.warrior2, (100, self.height - self.ground_height - self.warrior2.get_height() + 1))
         self.stage.blit(self.warrior3, (50, self.height - self.ground_height - self.warrior3.get_height() + 1))
         self.stage.blit(self.warrior4, (0, self.height - self.ground_height - self.warrior4.get_height() + 1))
+
+    def intro(self):
+        self.animate()
+        bottomlimit = self.height - self.ground_height - self.image.get_height()
+        if self.x < self.width + 300:
+            self.stage.blit(self.image, (self.x, bottomlimit + 4))
+            self.stage.blit(self.warrior1, (self.x - 150, self.height - self.ground_height - self.warrior1.get_height() + 1))
+            self.stage.blit(self.warrior2, (self.x - 200, self.height - self.ground_height - self.warrior2.get_height() + 1))
+            self.stage.blit(self.warrior3, (self.x - 250, self.height - self.ground_height - self.warrior3.get_height() + 1))
+            self.stage.blit(self.warrior4, (self.x - 300, self.height - self.ground_height - self.warrior4.get_height() + 1))
+            self.x += 3
+        else:
+            self.x = 0
