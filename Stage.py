@@ -1,12 +1,15 @@
 import pygame
 import random
 from Player import Player
-from Image import Cloud, Ground
+from Image import Cloud, Ground, Image
 from Timer import Timer
+from Obstacle import Obstacle
 pygame.font.init()
 JUMP_LIMIT = 2  # 점프 한도
 TITLE_FONT = pygame.font.Font('resources/fonts/CulDeSac.ttf', 90)
+COUNT_FONT = pygame.font.Font('resources/fonts/Pixel.ttf', 80)
 MENU_FONT = pygame.font.Font('resources/fonts/AmaticSC-Bold.ttf', 60)
+SPEED = 4  # 배경(구름), 장애물 움직이는 속도
 
 
 class Stage:
@@ -29,21 +32,34 @@ class Stage:
         self.stage = pygame.display.set_mode((self.width, self.height))
         self.stage.blit(self.background, (0, 0))
         self.player = Player(self.stage, self.ground, self.width, self.height)
-        self.count = 0  # 점프한 횟수(K_UP누른 횟수)
+        self.count = 0  # 점프한 횟수(K_UP 누른 횟수)
         self.cloud_count = 1
+        self.obstacle_count = 270
         self.clouds = []
+        self.intro_clouds = []
+        self.obstacles = []
+        self.life = Image('resources/images/heart_Resized2.png')  # 라이프 이미지 불러오기
+        self.life_list = [self.life.get_image(0, 0, 36, 44),  # 꽉 찬 하트
+                          self.life.get_image(36, 0, 36, 44)]  # 빈 하트
+        self.life_count = 3 # 라이프 초기 설정값
 
     def menu_choice(self):
         start = False
         pygame.display.update()
         menu = self.height/2
 
-        while not start:
+        while not start: # 초기 화면 설정 (Intro 화면 설정)
             self.stage.blit(self.background, (0, 0))
-            self.text("M2Beat", TITLE_FONT, (255, 255, 255), self.width/2, self.height/4 - 20)
-            self.text("Start", MENU_FONT, (0, 0, 0), self.width/2 + 20, self.height/2)
-            self.text("Exit", MENU_FONT, (0, 0, 0), self.width/2 + 20, self.height/2 + 100)
-            self.text(">", MENU_FONT, (0, 0, 0), self.width/2 - 50, menu)
+            intro_clouds = [Cloud(self.stage, self.cloud_list[0], 15, 87, 0),
+                            Cloud(self.stage, self.cloud_list[1], 315, 32, 0),
+                            Cloud(self.stage, self.cloud_list[2], 615, 45, 0),
+                            Cloud(self.stage, self.cloud_list[3], 915, 25, 0)]
+            for intro_cloud in intro_clouds:
+                intro_cloud.move()
+            self.text("M2BEAT", TITLE_FONT, (255, 255, 255), self.width/2, self.height/4 + 30)
+            self.text("Start", MENU_FONT, (0, 0, 0), self.width/2, self.height/2)
+            self.text("Exit", MENU_FONT, (0, 0, 0), self.width/2, self.height/2 + 100)
+            self.text(">", MENU_FONT, (0, 0, 0), self.width/2 - 80, menu)
             Ground(self.stage, self.ground, 0, self.height - self.ground.get_height())
             self.player.intro()
             pygame.display.update()
@@ -68,7 +84,7 @@ class Stage:
                             start = True
                             self.finish = True
 
-    def text(self, text, font, color, x, y):
+    def text(self, text, font, color, x, y):  # 텍스트 그리는 함수
         surface = font.render(text, True, color)
         rect = surface.get_rect()
         rect.midtop = (x, y)
@@ -79,8 +95,9 @@ class Stage:
         Ground(self.stage, self.ground, 0, self.height - self.ground.get_height())
         self.player.move()
         self.cloud_count -= 1
+
         if self.cloud_count == 0:
-            cloud = Cloud(self.stage, self.cloud_list[random.randint(0, 3)], self.width, random.randint(0, 100))
+            cloud = Cloud(self.stage, self.cloud_list[random.randint(0, 3)], self.width, random.randint(0, 100), SPEED)
             self.clouds.append(cloud)
             self.cloud_count = 100  # cloud_count가 작아지면 구름 갯수가 많아짐
         for cloud in self.clouds:
@@ -88,25 +105,49 @@ class Stage:
         if self.clouds[0].x == -350:
             self.clouds.pop(-(len(self.cloud_list))-1)
 
+        if self.life_count == 3:  # 라이프 변수가 3일 때
+            self.stage.blit(self.life_list[0], (20, 635))
+            self.stage.blit(self.life_list[0], (64, 635))
+            self.stage.blit(self.life_list[0], (108, 635))
+        elif self.life_count == 2:  # 라이프 변수가 2일 때
+            self.stage.blit(self.life_list[0], (20, 635))
+            self.stage.blit(self.life_list[0], (64, 635))
+            self.stage.blit(self.life_list[1], (108, 635))
+        elif self.life_count == 1:  # 라이프 변수가 3일 때
+            self.stage.blit(self.life_list[0], (20, 635))
+            self.stage.blit(self.life_list[1], (64, 635))
+            self.stage.blit(self.life_list[1], (108, 635))
+
     def start(self):
-        time = Timer(self.stage, 6)
-        time.timer()
+        clock = Timer(self.stage, 6, self.finish)
+        clock.timer()
         while not self.finish:
+            self.obstacle_count -= 1
+            self.update()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.finish = True
+                if self.count == JUMP_LIMIT:
+                    if self.player.pos.y == self.height - self.ground.get_height() - self.player.image.get_height() + 4:
+                        self.count = 0
+                    self.player.jumping = False
                 if event.type == pygame.KEYDOWN:  # 한번 눌렀을 때 실행
-                    if event.key == pygame.K_UP and self.count < JUMP_LIMIT:
+                    if event.key == pygame.K_UP and self.count < JUMP_LIMIT:  # 방향키 윗키
                         self.player.jump()
                         self.count += 1
-                    elif self.count == JUMP_LIMIT:
-                        if self.player.pos.y == self.height - self.ground.get_height() - self.player.image.get_height() + 4:
-                            self.count = 0
-                    self.player.jumping = False
+                    elif event.key == pygame.K_SPACE:  # 스페이스바 (임시로 라이프 깎는 용)
+                        self.life_count -= 1
+
+            if clock.Return() > 0:  # 시작하기 전 5초 세기 (몇 초 셀건지 바꾸려면 Timer 클래스에서)
+                self.text(str(clock.Return()), COUNT_FONT, (255, 255, 255), self.width / 2, self.height / 2)
+            if self.obstacle_count == 0:
+                obstacle = Obstacle(self.stage, self.width, self.height, SPEED)
+                self.obstacles.append(obstacle)
+                self.obstacle_count = 250
+            for obj in self.obstacles:
+                obj.move()
+
             self.player.move()
-            self.update()
-            if time.Return()>0:
-                self.text(str(time.Return()), TITLE_FONT, (255, 255, 255), self.width / 2, self.height / 4 - 20)
             pygame.display.update()
 
 game = Stage()
