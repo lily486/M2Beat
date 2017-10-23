@@ -12,12 +12,12 @@ class Image:  # 이미지 불러오기
 
 
 class Cloud:
-    def __init__(self, stage, cloud, width, y):
+    def __init__(self, stage, cloud, x, y, speed):
         self.stage = stage
         self.cloud = cloud
-        self.x = width
+        self.x = x
         self.y = y
-        self.speed = 6
+        self.speed = speed
 
     def move(self):
         self.x -= self.speed
