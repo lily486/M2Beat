@@ -9,7 +9,6 @@ class Collide:
         self.player = player
         self.obstacles = obstacles
         self.stage = stage
-        self.life_count = 3
         self.life = Image('resources/images/heart_Resized2.png')  # 라이프 이미지 불러오기
         self.life_list = [self.life.get_image(0, 0, 36, 44),  # 꽉 찬 하트
                           self.life.get_image(36, 0, 36, 44)]  # 빈 하트
