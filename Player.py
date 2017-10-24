@@ -4,15 +4,17 @@ vec = pygame.math.Vector2
 PLAYER_ACC = 0.1  # 가속
 PLAYER_FRICTION = -0.08  # 마찰
 PLAYER_GRAV = 0.3  # 중력
-
+JUMP_LIMIT = 2
 pygame.display.set_mode((1200, 700))
 
 
-class Player:
-    def __init__(self, stage, ground,  width, height):
+class Player(pygame.Rect):
+    def __init__(self, stage, ground,  width, height, finish):
         self.stage = stage
+        self.finish = finish
         self.walking = True  # 계속 움직이는 것처럼 보이게하는 상태
         self.jumping = False  # 점프 유무
+        self.jump_count = 0  # 점프 횟수
         self.party = True  # 쫓아오는 용사무리
         self.current_frame = 0
         self.last_update_walk = 0
@@ -61,6 +63,7 @@ class Player:
 
     def jump(self):
         self.vel.y = -10
+        self.jump_count += 1
 
     def animate(self):  # 이미지 바꾸는 함수 (애니메이션)
         now_walk = pygame.time.get_ticks()
@@ -98,21 +101,26 @@ class Player:
         self.acc = vec(0, PLAYER_GRAV)
         bottomlimit = self.height - self.ground_height - self.image.get_height()
         # bottiomlimit = (게임화면 세로길이) - (Ground 세로길이) - (플레이어 세로길이)
-        pressed = pygame.key.get_pressed()
-        if pressed[pygame.K_RIGHT]:
-            pass
-            #self.pos.x += 2
-        if pressed[pygame.K_LEFT]:
-            pass
-            #self.pos.x -= 2
-
         self.acc.x += self.vel.x * PLAYER_FRICTION
         self.vel += self.acc
         self.pos += self.vel + PLAYER_GRAV * self.acc
 
         if self.pos.y > bottomlimit + 4:  # 바닥(Ground) 밑으로 안떨어지게 하는 if문
             self.pos.y = bottomlimit + 4  # +4는 바닥이랑 제대로 맞추려고 ㅎ..
-
+        for move in pygame.event.get():
+            if move.type == pygame.QUIT:
+                self.finish = True
+            if self.jump_count == JUMP_LIMIT:
+                if self.pos.y == bottomlimit + 4:
+                    self.jump_count = 0
+                    self.jumping = False
+            if move.type == pygame.KEYDOWN:
+                if move.key == pygame.K_UP and self.jump_count < JUMP_LIMIT:
+                    self.jump()
+                elif move.key == pygame.K_RIGHT:
+                    pass
+                elif move.key == pygame.K_LEFT:
+                    pass
         self.rect.midbottom = self.pos
 
         self.stage.blit(self.image, (self.pos.x, self.pos.y))
