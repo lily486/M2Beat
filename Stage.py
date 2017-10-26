@@ -1,7 +1,7 @@
 import pygame
 import random
 from Player import Player
-from Image import Cloud, Ground
+from Image import Cloud, Ground, Image
 from Timer import Timer
 from Obstacle import Obstacle
 from Collide import Collide
@@ -10,6 +10,8 @@ JUMP_LIMIT = 2  # 점프 한도
 TITLE_FONT = pygame.font.Font('resources/fonts/CulDeSac.ttf', 90)
 COUNT_FONT = pygame.font.Font('resources/fonts/Pixel.ttf', 80)
 MENU_FONT = pygame.font.Font('resources/fonts/AmaticSC-Bold.ttf', 60)
+RESTART_FONT = pygame.font.Font('resources/fonts/CALIBRATE1.ttf', 30)
+GAMEOVER_FONT = pygame.font.Font('resources/fonts/grishenko_novoye_nbp.ttf', 60)
 SPEED = 4  # 배경(구름), 장애물 움직이는 속도
 
 
@@ -26,13 +28,18 @@ class Stage:
                   pygame.image.load('resources/images/cloud3.png'),
                   pygame.image.load('resources/images/cloud4.png')]
     finish = False
+    playAgain = False
+    exit = False
+    life = Image('resources/images/heart_Resized2.png')  # 라이프 이미지 불러오기
+    life_list = [life.get_image(0, 0, 36, 44),  # 꽉 찬 하트
+                 life.get_image(36, 0, 36, 44)]  # 빈 하트
 
     def __init__(self):
         pygame.init()
         pygame.display.set_caption("M2Beat")
         self.stage = pygame.display.set_mode((self.width, self.height))
         self.stage.blit(self.background, (0, 0))
-        self.player = Player(self.stage, self.ground, self.width, self.height, self.finish)
+        self.player = Player(self.stage, self.ground, self.width, self.height)
         self.count = 0  # 점프한 횟수(K_UP 누른 횟수)
         self.cloud_count = 1
         self.obstacle_count = 270
@@ -65,6 +72,8 @@ class Stage:
                 if event.type == pygame.QUIT:
                     start = True
                     self.finish = True
+                    self.exit = True
+                    self.playAgain = True
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_DOWN:
                         menu += 100
@@ -80,7 +89,9 @@ class Stage:
                             start = True
                         if menu == self.height/2 + 100:
                             start = True
-                            self.player.finish = True
+                            self.finish = True
+                            self.exit = True
+                            self.playAgain = True
 
     def text(self, text, font, color, x, y):  # 텍스트 그리는 함수
         surface = font.render(text, True, color)
@@ -103,13 +114,18 @@ class Stage:
         if self.clouds[0].x == -350:
             self.clouds.pop(-(len(self.clouds))-1)
 
-    def start(self):
-        clock = Timer(self.stage, 6, self.player.finish)  # 시작하기 전 5초 세기 (몇 초 셀건지 바꾸려면 +1 해서 설정)
+    def play(self):
+        self.playAgain = False
+        clock = Timer(6, self.finish)  # 시작하기 전 5초 세기 (몇 초 셀건지 바꾸려면 +1 해서 설정)
         clock.timer()
-        while not self.player.finish:
+        while not self.finish:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.finish = True
+                    self.exit = True
+                    self.playAgain = True
             self.obstacle_count -= 1
             self.update()
-
             if clock.Return() > 0:
                 self.text(str(clock.Return()), COUNT_FONT, (255, 255, 255), self.width / 2, self.height / 2)
             if self.obstacle_count == 0:
@@ -118,10 +134,60 @@ class Stage:
                 self.obstacle_count = 250
             for obj in self.obstacles:
                 obj.move()
-            self.collide.collider()
+            life_count = self.collide.collider()
+            if life_count == 3:
+                self.stage.blit(self.life_list[0], (20, 635))
+                self.stage.blit(self.life_list[0], (64, 635))
+                self.stage.blit(self.life_list[0], (108, 635))
+            elif life_count == 2:
+                self.stage.blit(self.life_list[0], (20, 635))
+                self.stage.blit(self.life_list[0], (64, 635))
+                self.stage.blit(self.life_list[1], (108, 635))
+            elif life_count == 1:
+                self.stage.blit(self.life_list[0], (20, 635))
+                self.stage.blit(self.life_list[1], (64, 635))
+                self.stage.blit(self.life_list[1], (108, 635))
+            else:  # 라이프 변수가 0일때 : 게임오버
+                self.finish = True
+                self.collide.init()
+                self.obstacle_count = 270
             self.player.move()
             pygame.display.update()
 
+    def restart(self):
+        choice = self.height/2 + 80
+        print("test")
+        while not self.playAgain:
+            self.stage.blit(self.background, (0, 0))
+            Ground(self.stage, self.ground, 0, self.height - self.ground.get_height())
+            self.text("GAME OVER", GAMEOVER_FONT, (255, 0, 0), self.width/2, self.height/3)
+            self.text("Replay", RESTART_FONT, (255, 255, 255), self.width/2, self.height/2 + 80)
+            self.text("EXIT", RESTART_FONT, (255, 255, 255), self.width/2, self.height/2 + 180)
+            self.text(">", RESTART_FONT, (255, 255, 0), self.width/2 - 80, choice)
+            pygame.display.update()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.playAgain = True
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_DOWN:
+                        choice += 100
+                    if event.key == pygame.K_UP:
+                        choice -= 100
+                if choice > self.height/2 + 180:  # 두가지 메뉴에서 벗어나지 않게 / 부등호 뒤에 EXIT 의 y 좌표
+                    choice = self.height/2 + 180
+                if choice < self.height/2 + 80:  # 부등호 뒤에 Replay 의 y 좌표
+                    choice = self.height/2 + 80
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        if choice == self.height/2 + 80:
+                            self.finish = False
+                            self.playAgain = True
+                            self.exit = False
+                        if choice == self.height/2 + 180:
+                            self.playAgain = True
+                            self.exit = True
 game = Stage()
 game.menu_choice()
-game.start()
+while not game.exit:
+    game.play()
+    game.restart()

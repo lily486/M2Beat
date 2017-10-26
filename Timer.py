@@ -2,10 +2,7 @@ import threading
 
 
 class Timer:
-    stage = None
-
-    def __init__(self, stage, count, finish):
-        self.stage = stage
+    def __init__(self, count, finish):
         self.count = count
         self.finish = finish
 
@@ -17,4 +14,5 @@ class Timer:
             timer.cancel()
 
     def Return(self):
+        print('test')
         return self.count

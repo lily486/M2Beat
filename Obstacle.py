@@ -19,3 +19,4 @@ class Obstacle(pygame.Rect):
     def move(self):
         self.pos -= self.speed
         self.stage.blit(self.obj, (self.pos, self.y_pos))
+        print("test")
