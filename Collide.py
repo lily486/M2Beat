@@ -12,11 +12,12 @@ class Collide:
 
     def collider(self):
        for obstacle in self.obstacles:
-           if self.player.pos.x + 48 > obstacle.pos and self.player.pos.x < obstacle.pos + obstacle.x:
+           if self.player.pos.x + 48 - 10 > obstacle.pos and self.player.pos.x - 10 < obstacle.pos + obstacle.x:
+            # -10은 이미지 옆에 빈 공간(투명한 공간) 맞추려고
                if self.player.pos.y > obstacle.y_pos:
                    self.life_count -= 1
                    self.obstacles.remove(obstacle)
-           if obstacle.pos < 215:
+           if obstacle.pos < 215 - 10:
                self.obstacles.remove(obstacle)
 
     def ReturnLife(self):

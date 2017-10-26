@@ -141,10 +141,11 @@ class Stage:
                 self.obstacle_count = random.randint(70, 150)
             for obj in self.obstacles:
                 obj.move()
-            #self.collide.collider()
+            self.collide.collider()
             self.rhythm.rhythm()
             combo = self.rhythm.ReturnCombo()
-            print(combo)
+            self.text("COMBO : ", MENU_FONT, (0, 0, 0), 100, 50)
+            self.text(str(combo), MENU_FONT, (0, 0, 0), 200, 50)
             life_count = self.collide.ReturnLife()
             if life_count == 3:
                 self.stage.blit(self.life_list[0], (20, 635))
