@@ -9,9 +9,8 @@ pygame.display.set_mode((1200, 700))
 
 
 class Player(pygame.Rect):
-    def __init__(self, stage, ground,  width, height, finish):
+    def __init__(self, stage, ground,  width, height):
         self.stage = stage
-        self.finish = finish
         self.walking = True  # 계속 움직이는 것처럼 보이게하는 상태
         self.jumping = False  # 점프 유무
         self.jump_count = 0  # 점프 횟수
@@ -69,6 +68,7 @@ class Player(pygame.Rect):
         now_walk = pygame.time.get_ticks()
         now_jumping = pygame.time.get_ticks()
         now_party = pygame.time.get_ticks()
+        print("Test")
 
         if self.walking:
             if now_walk - self.last_update_walk > 100:  # 숫자가 작아질수록 애니메이션 속도가 빨라짐
@@ -108,8 +108,6 @@ class Player(pygame.Rect):
         if self.pos.y > bottomlimit + 4:  # 바닥(Ground) 밑으로 안떨어지게 하는 if문
             self.pos.y = bottomlimit + 4  # +4는 바닥이랑 제대로 맞추려고 ㅎ..
         for move in pygame.event.get():
-            if move.type == pygame.QUIT:
-                self.finish = True
             if self.jump_count == JUMP_LIMIT:
                 if self.pos.y == bottomlimit + 4:
                     self.jump_count = 0
