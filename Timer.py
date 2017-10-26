@@ -14,5 +14,4 @@ class Timer:
             timer.cancel()
 
     def Return(self):
-        print('test')
         return self.count

@@ -18,9 +18,9 @@ class Collide:
                    self.obstacles.remove(obstacle)
            if obstacle.pos < 215:
                self.obstacles.remove(obstacle)
-       return self.life_count
+
+    def ReturnLife(self):
+        return self.life_count
 
     def init(self):
         self.life_count = 3
-        print("test")
-

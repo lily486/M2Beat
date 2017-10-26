@@ -68,7 +68,6 @@ class Player(pygame.Rect):
         now_walk = pygame.time.get_ticks()
         now_jumping = pygame.time.get_ticks()
         now_party = pygame.time.get_ticks()
-        print("Test")
 
         if self.walking:
             if now_walk - self.last_update_walk > 100:  # 숫자가 작아질수록 애니메이션 속도가 빨라짐
