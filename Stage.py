@@ -10,14 +10,11 @@ pygame.font.init()
 JUMP_LIMIT = 2  # 점프 한도
 TITLE_FONT = pygame.font.Font('resources/fonts/CulDeSac.ttf', 90)
 COUNT_FONT = pygame.font.Font('resources/fonts/Pixel.ttf', 80)
-MENU_FONT = pygame.font.Font('resources/fonts/AmaticSC-Bold.ttf', 60)
-RESTART_FONT = pygame.font.Font('resources/fonts/CALIBRATE1.ttf', 30)
+COMBO_FONT = pygame.font.Font('resources/fonts/AmaticSC-Bold.ttf', 40)
+MENU_FONT = pygame.font.Font('resources/fonts/CALIBRATE1.ttf', 30)
 GAMEOVER_FONT = pygame.font.Font('resources/fonts/grishenko_novoye_nbp.ttf', 60)
 SPEED = 4  # 배경(구름), 장애물 움직이는 속도
-DOWN = 0
-LEFT = 1
-RIGHT = 2
-UP = 3
+
 
 class Stage:
     width = 1200  # 가로
@@ -37,7 +34,7 @@ class Stage:
     life = Image('resources/images/heart_Resized2.png')  # 라이프 이미지 불러오기
     life_list = [life.get_image(0, 0, 36, 44),  # 꽉 찬 하트
                  life.get_image(36, 0, 36, 44)]  # 빈 하트
-    box_img = pygame.image.load('resources/images/boxResized.png')
+    box_img = pygame.image.load('resources/images/squareResized.png')
 
     def __init__(self):
         pygame.init()
@@ -69,9 +66,9 @@ class Stage:
             for intro_cloud in intro_clouds:
                 intro_cloud.move()
             self.text("M2BEAT", TITLE_FONT, (255, 255, 255), self.width/2, self.height/4 + 30)
-            self.text("Start", MENU_FONT, (0, 0, 0), self.width/2, self.height/2)
-            self.text("Exit", MENU_FONT, (0, 0, 0), self.width/2, self.height/2 + 100)
-            self.text(">", MENU_FONT, (0, 0, 0), self.width/2 - 80, menu)
+            self.text("Start", MENU_FONT, (255, 255, 255), self.width/2, self.height/2)
+            self.text("Exit", MENU_FONT, (255, 255, 255), self.width/2, self.height/2 + 100)
+            self.text(">", MENU_FONT, (255, 255, 0), self.width/2 - 60, menu)
             Ground(self.stage, self.ground, 0, self.height - self.ground.get_height())
             self.player.intro()
             pygame.display.update()
@@ -119,9 +116,12 @@ class Stage:
             cloud.move()
         if self.clouds[0].x == -350:
             self.clouds.pop(-(len(self.clouds))-1)
-        self.stage.blit(self.box_img, (320, self.height - self.ground.get_height() - 75))
+        self.stage.blit(self.box_img, (320, self.height - self.ground.get_height() - 145))
 
     def play(self):
+        self.obstacles = []
+        self.collide = Collide(self.player, self.obstacles, self.stage)
+        self.rhythm = Rhythm(self.obstacles, self.stage)
         self.playAgain = True
         clock = Timer(6, self.finish)  # 시작하기 전 5초 세기 (몇 초 셀건지 바꾸려면 +1 해서 설정)
         clock.timer()
@@ -133,19 +133,20 @@ class Stage:
                     self.playAgain = False
             self.obstacle_count -= 1
             self.update()
+            self.player.move()
             if clock.Return() > 0:
                 self.text(str(clock.Return()), COUNT_FONT, (255, 255, 255), self.width / 2, self.height / 2)
             if self.obstacle_count == 0:
                 obstacle = Obstacle(self.stage, self.width, self.height, SPEED)
                 self.obstacles.append(obstacle)
-                self.obstacle_count = random.randint(70, 150)
+                self.obstacle_count = random.randint(20, 80)
             for obj in self.obstacles:
                 obj.move()
             self.collide.collider()
             self.rhythm.rhythm()
             combo = self.rhythm.ReturnCombo()
-            self.text("COMBO : ", MENU_FONT, (0, 0, 0), 100, 50)
-            self.text(str(combo), MENU_FONT, (0, 0, 0), 200, 50)
+            self.text("COMBO : ", COMBO_FONT, (255, 255, 255), 100, 50)
+            self.text(str(combo), COMBO_FONT, (255, 255, 255), 200, 50)
             life_count = self.collide.ReturnLife()
             if life_count == 3:
                 self.stage.blit(self.life_list[0], (20, 635))
@@ -163,8 +164,6 @@ class Stage:
                 self.finish = True
                 self.collide.init()
                 self.obstacle_count = 270
-            self.player.move()
-
             pygame.display.update()
 
     def restart(self):
@@ -173,9 +172,9 @@ class Stage:
             self.stage.blit(self.background, (0, 0))
             Ground(self.stage, self.ground, 0, self.height - self.ground.get_height())
             self.text("GAME OVER", GAMEOVER_FONT, (255, 0, 0), self.width/2, self.height/3)
-            self.text("Replay", RESTART_FONT, (255, 255, 255), self.width/2, self.height/2 + 80)
-            self.text("EXIT", RESTART_FONT, (255, 255, 255), self.width/2, self.height/2 + 180)
-            self.text(">", RESTART_FONT, (255, 255, 0), self.width/2 - 80, choice)
+            self.text("Replay", MENU_FONT, (255, 255, 255), self.width/2, self.height/2 + 80)
+            self.text("EXIT", MENU_FONT, (255, 255, 255), self.width/2, self.height/2 + 180)
+            self.text(">", MENU_FONT, (255, 255, 0), self.width/2 - 80, choice)
             pygame.display.update()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
