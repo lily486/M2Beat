@@ -164,6 +164,9 @@ class Stage:
                 self.finish = True
                 self.collide.init()
                 self.obstacle_count = 270
+            score = self.rhythm.ReturnScore()
+            self.text("SCORE : ", COMBO_FONT, (255,255,255), 600, 50)
+            self.text(str(score), COMBO_FONT, (255,255,255), 700, 50)
             pygame.display.update()
 
     def restart(self):
