@@ -17,7 +17,7 @@ class Collide:
                if self.player.pos.y > obstacle.y_pos:
                    self.life_count -= 1
                    self.obstacles.remove(obstacle)
-           if obstacle.pos < 215 - 10:
+           if obstacle.pos > 1100:
                self.obstacles.remove(obstacle)
 
     def ReturnLife(self):
