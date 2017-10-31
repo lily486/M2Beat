@@ -15,11 +15,11 @@ class Obstacle(pygame.Rect):
                   pygame.transform.rotate(arrow_img, 180),
                   pygame.transform.rotate(arrow_img, 270)]
 
-    def __init__(self, stage, width, height, speed):
+    def __init__(self, stage, height, speed):
         self.x = 50  # 장애물의 가로값
         self.y = 50  # 장애물의 세로값
         self.stage = stage
-        self.pos = width
+        self.pos = 280  # 장애물이 처음 생성되는 지점의  x좌표
         self.y_pos = height - self.y - 86
         self.height = height
         self.speed = speed
@@ -29,7 +29,7 @@ class Obstacle(pygame.Rect):
         self.obj.fill((0, 0, 0))  # 색깔 채우기
 
     def move(self):
-        self.pos -= self.speed
+        self.pos += self.speed
         self.stage.blit(self.arrow, (self.pos, self.y_pos - 80))
         self.stage.blit(self.obj, (self.pos, self.y_pos))
         if self.arrow == self.arrow_list[0]:

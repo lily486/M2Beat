@@ -27,8 +27,8 @@ class Player(pygame.Rect):
         self.warrior3 = self.warrior3_frame[0]
         self.warrior4 = self.warrior4_frame[0]
         self.rect = self.image.get_rect()
-        self.pos = vec(250, 1200 - 86 - 48 + 4)  # 플레이어 시작 위치 (가로, 세로(=bottomlimit이랑 일치하게))
-        self.x = 250
+        self.pos = vec(955, 1200 - 86 - 48 + 4)  # 플레이어 시작 위치 (가로, 세로(=bottomlimit이랑 일치하게))
+        self.x = 250  # intro 화면에서 사용하는 x좌표
         self.vel = vec(0, 0)  # 속도계산
         self.acc = vec(0, 0)  # 가속계산
         self.ground_height = ground.get_height()
@@ -121,10 +121,10 @@ class Player(pygame.Rect):
         self.rect.midbottom = self.pos
 
         self.stage.blit(self.image, (self.pos.x, self.pos.y))
-        self.stage.blit(self.warrior1, (150, self.height - self.ground_height - self.warrior1.get_height() + 1))
-        self.stage.blit(self.warrior2, (100, self.height - self.ground_height - self.warrior2.get_height() + 1))
-        self.stage.blit(self.warrior3, (50, self.height - self.ground_height - self.warrior3.get_height() + 1))
-        self.stage.blit(self.warrior4, (0, self.height - self.ground_height - self.warrior4.get_height() + 1))
+        self.stage.blit(self.warrior1, (250, self.height - self.ground_height - self.warrior1.get_height() + 1))
+        self.stage.blit(self.warrior2, (200, self.height - self.ground_height - self.warrior2.get_height() + 1))
+        self.stage.blit(self.warrior3, (150, self.height - self.ground_height - self.warrior3.get_height() + 1))
+        self.stage.blit(self.warrior4, (100, self.height - self.ground_height - self.warrior4.get_height() + 1))
 
     def intro(self):
         self.animate()

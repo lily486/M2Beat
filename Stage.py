@@ -8,11 +8,14 @@ from Collide import Collide
 from Rhythm import Rhythm
 pygame.font.init()
 JUMP_LIMIT = 2  # 점프 한도
+
 TITLE_FONT = pygame.font.Font('resources/fonts/CulDeSac.ttf', 90)
 COUNT_FONT = pygame.font.Font('resources/fonts/Pixel.ttf', 80)
 COMBO_FONT = pygame.font.Font('resources/fonts/AmaticSC-Bold.ttf', 40)
 MENU_FONT = pygame.font.Font('resources/fonts/CALIBRATE1.ttf', 30)
 GAMEOVER_FONT = pygame.font.Font('resources/fonts/grishenko_novoye_nbp.ttf', 60)
+VALUE_FONT = pygame.font.Font('resources/fonts/grishenko_novoye_nbp.ttf', 25)
+
 SPEED = 4  # 배경(구름), 장애물 움직이는 속도
 
 
@@ -44,13 +47,15 @@ class Stage:
         self.player = Player(self.stage, self.ground, self.width, self.height)
         self.count = 0  # 점프한 횟수(K_UP 누른 횟수)
         self.cloud_count = 1
-        self.obstacle_count = 270
+        self.obstacle_count = 275
         self.clouds = []
         self.intro_clouds = []
         self.obstacles = []
         self.key = None
         self.collide = Collide(self.player, self.obstacles, self.stage)
         self.rhythm = Rhythm(self.obstacles, self.stage)
+        self.score = 0
+        self.value_y = 200
 
     def menu_choice(self):
         start = False
@@ -111,12 +116,14 @@ class Stage:
         if self.cloud_count == 0:
             cloud = Cloud(self.stage, self.cloud_list[random.randint(0, 3)], self.width, random.randint(0, 100), SPEED)
             self.clouds.append(cloud)
-            self.cloud_count = 100  # cloud_count가 작아지면 구름 갯수가 많아짐
+            self.cloud_count = 100  # cloud_count 가 작아지면 구름 갯수가 많아짐
         for cloud in self.clouds:
             cloud.move()
         if self.clouds[0].x == -350:
             self.clouds.pop(-(len(self.clouds))-1)
-        self.stage.blit(self.box_img, (320, self.height - self.ground.get_height() - 145))
+        self.stage.blit(self.box_img, (850, self.height - self.ground.get_height() - 145))
+        value = self.rhythm.ReturnValue()
+        self.text(value, VALUE_FONT, (255, 255, 0), 890, self.height - self.ground.get_height() - self.value_y)
 
     def play(self):
         self.obstacles = []
@@ -137,7 +144,7 @@ class Stage:
             if clock.Return() > 0:
                 self.text(str(clock.Return()), COUNT_FONT, (255, 255, 255), self.width / 2, self.height / 2)
             if self.obstacle_count == 0:
-                obstacle = Obstacle(self.stage, self.width, self.height, SPEED)
+                obstacle = Obstacle(self.stage, self.height, SPEED)
                 self.obstacles.append(obstacle)
                 self.obstacle_count = random.randint(20, 80)
             for obj in self.obstacles:
@@ -164,9 +171,9 @@ class Stage:
                 self.finish = True
                 self.collide.init()
                 self.obstacle_count = 270
-            score = self.rhythm.ReturnScore()
-            self.text("SCORE : ", COMBO_FONT, (255,255,255), 600, 50)
-            self.text(str(score), COMBO_FONT, (255,255,255), 700, 50)
+            self.score = self.rhythm.ReturnScore()
+            self.text("SCORE : ", COMBO_FONT, (255, 255, 255), 600, 50)
+            self.text(str(self.score), COMBO_FONT, (255, 255, 255), 700, 50)
             pygame.display.update()
 
     def restart(self):
@@ -178,6 +185,8 @@ class Stage:
             self.text("Replay", MENU_FONT, (255, 255, 255), self.width/2, self.height/2 + 80)
             self.text("EXIT", MENU_FONT, (255, 255, 255), self.width/2, self.height/2 + 180)
             self.text(">", MENU_FONT, (255, 255, 0), self.width/2 - 80, choice)
+            self.text("YOUR SCORE : ", MENU_FONT, (255, 255, 255), self.width/2 - 60, self.height/3 - 100)
+            self.text(str(self.score), MENU_FONT, (255, 255, 255), self.width/2 + 85, self.height/3 - 100)
             pygame.display.update()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
