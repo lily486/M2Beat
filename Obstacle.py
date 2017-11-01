@@ -8,7 +8,12 @@ RIGHT = 2
 DOWN = 3
 
 
-class Obstacle(pygame.Rect):
+class Obstacle:
+    fireball_img = pygame.image.load('resources/images/Fireball.png')
+    oarrow_img = pygame.image.load('resources/images/oarrow.png')
+    lightning_img = pygame.image.load('resources/images/lightning.png')
+    kunai_img = pygame.image.load('resources/images/kunai.png')
+    obstacle_list = [fireball_img, oarrow_img, lightning_img, kunai_img]
     arrow_img = pygame.image.load('resources/images/arrow_resized.png')
     arrow_list = [pygame.transform.rotate(arrow_img, 0),
                   pygame.transform.rotate(arrow_img, 90),
@@ -16,17 +21,17 @@ class Obstacle(pygame.Rect):
                   pygame.transform.rotate(arrow_img, 270)]
 
     def __init__(self, stage, height, speed):
-        self.x = 50  # 장애물의 가로값
-        self.y = 50  # 장애물의 세로값
+        self.x = 40  # 장애물의 가로값
+        self.y = 40  # 장애물의 세로값
         self.stage = stage
         self.pos = 280  # 장애물이 처음 생성되는 지점의  x좌표
         self.y_pos = height - self.y - 86
         self.height = height
         self.speed = speed
-        self.arrow = self.arrow_list[random.randint(0, 3)]
+        self.index = random.randint(0, 3)
+        self.arrow = self.arrow_list[self.index]
         self.key = None
-        self.obj = pygame.Surface((self.x, self.y))  # 직사각형 생성
-        self.obj.fill((0, 0, 0))  # 색깔 채우기
+        self.obj = self.obstacle_list[self.index]  # 장애물 생성
 
     def move(self):
         self.pos += self.speed
