@@ -9,7 +9,7 @@ pygame.display.set_mode((1200, 700))
 
 
 class Player(pygame.Rect):
-    def __init__(self, stage, ground,  width, height):
+    def __init__(self, stage, width, height):
         self.stage = stage
         self.walking = True  # 계속 움직이는 것처럼 보이게하는 상태
         self.jumping = False  # 점프 유무
@@ -27,14 +27,17 @@ class Player(pygame.Rect):
         self.warrior3 = self.warrior3_frame[0]
         self.warrior4 = self.warrior4_frame[0]
         self.rect = self.image.get_rect()
-        self.pos = vec(955, 1200 - 86 - 48 + 4)  # 플레이어 시작 위치 (가로, 세로(=bottomlimit이랑 일치하게))
+        self.pos = vec(955, 1200 - 90 - 48 + 4)  # 플레이어 시작 위치 (가로, 세로(=bottomlimit이랑 일치하게))
         self.x = 250  # intro 화면에서 사용하는 x좌표
         self.vel = vec(0, 0)  # 속도계산
         self.acc = vec(0, 0)  # 가속계산
-        self.ground_height = ground.get_height()
+        self.ground_height = 90
 
     slime = Image('resources/images/Slime4.png')  # 슬라임이미지 불러오기
-    warrior_img = Image('resources/images/warrior_partyResized.png')
+    warrior_img = Image('resources/images/warrior.png')
+    mage_img = Image('resources/images/mage.png')
+    magician_img = Image('resources/images/magician.png')
+    ninja_img = Image('resources/images/ninja.png')
 
     walk_frame = [slime.get_image(0, 96, 48, 48),
                   slime.get_image(48, 96, 48, 48),

@@ -11,8 +11,8 @@ DOWN = 3
 class Obstacle:
     fireball_img = pygame.image.load('resources/images/Fireball.png')
     oarrow_img = pygame.image.load('resources/images/oarrow.png')
-    lightning_img = pygame.image.load('resources/images/lightning.png')
-    kunai_img = pygame.image.load('resources/images/kunai.png')
+    lightning_img = pygame.image.load('resources/images/lightningResized.png')
+    kunai_img = pygame.image.load('resources/images/kunaiResized.png')
     obstacle_list = [fireball_img, oarrow_img, lightning_img, kunai_img]
     arrow_img = pygame.image.load('resources/images/arrow_resized.png')
     arrow_list = [pygame.transform.rotate(arrow_img, 0),
@@ -35,7 +35,7 @@ class Obstacle:
 
     def move(self):
         self.pos += self.speed
-        self.stage.blit(self.arrow, (self.pos, self.y_pos - 80))
+        self.stage.blit(self.arrow, (self.pos, self.y_pos - 90))
         self.stage.blit(self.obj, (self.pos, self.y_pos))
         if self.arrow == self.arrow_list[0]:
             self.key = RIGHT

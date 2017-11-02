@@ -15,7 +15,7 @@ class Rhythm:
         self.combo = 0
         self.combos = []
         self.total = 0      # 총 점수
-        self.value = None
+        self.value_list = []
 
     def rhythm(self):
         pressed = pygame.key.get_pressed()
@@ -25,13 +25,16 @@ class Rhythm:
                 if pressed[pygame.K_UP]:
                     if pressed_key == UP:
                         if 850 + 25 < obj.pos + 50 < 850 + 35:
-                            self.value = "Good"
+                            value = ["Good", 200]
+                            self.value_list.append(value)
                             self.total += self.combo + 50
                         elif 850 + 35 <= obj.pos + 50 < 850 + 50:
-                            self.value = "Great"
+                            value = ["Great", 200]
+                            self.value_list.append(value)
                             self.total += self.combo + 70
                         elif 850 + 50 <= obj.pos + 50 < 850 + 75:
-                            self.value = "Perfect"
+                            value = ["Perfect", 200]
+                            self.value_list.append(value)
                             self.total += self.combo + 100
                         self.combo += 1
                         self.arrows.remove(obj)
@@ -41,13 +44,16 @@ class Rhythm:
                 elif pressed[pygame.K_DOWN]:
                     if pressed_key == DOWN:
                         if 850 + 25 < obj.pos + 50 < 850 + 35:
-                            self.value = "Good"
+                            value = ["Good", 200]
+                            self.value_list.append(value)
                             self.total += self.combo + 50
                         elif 850 + 35 <= obj.pos + 50 < 850 + 50:
-                            self.value = "Great"
+                            value = ["Great", 200]
+                            self.value_list.append(value)
                             self.total += self.combo + 70
                         elif 850 + 50 <= obj.pos + 50 < 850 + 75:
-                            self.value = "Perfect"
+                            value = ["Perfect", 200]
+                            self.value_list.append(value)
                             self.total += self.combo + 100
                         self.combo += 1
                         self.arrows.remove(obj)
@@ -56,13 +62,16 @@ class Rhythm:
                 elif pressed[pygame.K_LEFT]:
                     if pressed_key == LEFT:
                         if 850 + 25 < obj.pos + 50 < 850 + 35:
-                            self.value = "Good"
+                            value = ["Good", 200]
+                            self.value_list.append(value)
                             self.total += self.combo + 50
                         elif 850 + 35 <= obj.pos + 50 < 850 + 50:
-                            self.value = "Great"
+                            value = ["Great", 200]
+                            self.value_list.append(value)
                             self.total += self.combo + 70
                         elif 850 + 50 <= obj.pos + 50 < 850 + 75:
-                            self.value = "Perfect"
+                            value = ["Perfect", 200]
+                            self.value_list.append(value)
                             self.total += self.combo + 100
                         self.combo += 1
                         self.arrows.remove(obj)
@@ -71,13 +80,16 @@ class Rhythm:
                 elif pressed[pygame.K_RIGHT]:
                     if pressed_key == RIGHT:
                         if 850 + 25 < obj.pos + 50 < 850 + 35:
-                            self.value = "Good"
+                            value = ["Good", 200]
+                            self.value_list.append(value)
                             self.total += self.combo + 50
                         elif 850 + 35 <= obj.pos + 50 < 850 + 50:
-                            self.value = "Great"
+                            value = ["Great", 200]
+                            self.value_list.append(value)
                             self.total += self.combo + 70
                         elif 850 + 50 <= obj.pos + 50 < 850 + 75:
-                            self.value = "Perfect"
+                            value = ["Perfect", 200]
+                            self.value_list.append(value)
                             self.total += self.combo + 100
                         self.combo += 1
                         self.arrows.remove(obj)
@@ -93,4 +105,4 @@ class Rhythm:
         return self.total
 
     def ReturnValue(self):
-        return self.value
+        return self.value_list
