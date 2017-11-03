@@ -16,6 +16,7 @@ class Rhythm:
         self.combos = []
         self.total = 0      # 총 점수
         self.value_list = []
+        self.life_count = 3
 
     def rhythm(self):
         pressed = pygame.key.get_pressed()
@@ -98,6 +99,10 @@ class Rhythm:
             elif obj.pos + 50 > 850 + 75:
                 self.combo = 0
 
+            if obj.pos + 50 > 965:
+                self.life_count -= 1
+                self.arrows.remove(obj)
+
     def ReturnCombo(self):
         return self.combo
 
@@ -106,3 +111,6 @@ class Rhythm:
 
     def ReturnValue(self):
         return self.value_list
+
+    def ReturnLife(self):
+        return self.life_count
