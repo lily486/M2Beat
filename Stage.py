@@ -1,7 +1,7 @@
 import pygame
 import random
 from Player import Player
-from Image import Cloud, Ground, Image
+from Image import Cloud, Image
 from Timer import Timer
 from Obstacle import Obstacle
 from Collide import Collide
@@ -16,7 +16,7 @@ MENU_FONT = pygame.font.Font('resources/fonts/CALIBRATE1.ttf', 30)
 GAMEOVER_FONT = pygame.font.Font('resources/fonts/grishenko_novoye_nbp.ttf', 60)
 VALUE_FONT = pygame.font.Font('resources/fonts/grishenko_novoye_nbp.ttf', 25)
 
-SPEED = 4  # 배경(구름), 장애물 움직이는 속도
+SPEED = 3  # 배경(구름), 장애물 움직이는 속도
 
 
 class Stage:
@@ -25,7 +25,7 @@ class Stage:
     FPS = 30
     fpsClock = pygame.time.Clock()
     player = None
-    background = pygame.image.load('resources/images/backgroundCutResized.png')
+    background = pygame.image.load('resources/images/backResized.png')
     ground = pygame.image.load('resources/images/ground.png')
     cloud_list = [pygame.image.load('resources/images/cloud1.png'),
                   pygame.image.load('resources/images/cloud2.png'),
@@ -44,7 +44,7 @@ class Stage:
         pygame.display.set_caption("M2Beat")
         self.stage = pygame.display.set_mode((self.width, self.height))
         self.stage.blit(self.background, (0, 0))
-        self.player = Player(self.stage, self.ground, self.width, self.height)
+        self.player = Player(self.stage, self.width, self.height)
         self.count = 0  # 점프한 횟수(K_UP 누른 횟수)
         self.cloud_count = 1
         self.obstacle_count = 275
@@ -55,12 +55,15 @@ class Stage:
         self.collide = Collide(self.player, self.obstacles, self.stage)
         self.rhythm = Rhythm(self.obstacles, self.stage)
         self.score = 0
-        self.value_y = 200
+        self.bX = 1200
+        self.bXtimer = 200
 
     def menu_choice(self):
         start = False
         pygame.display.update()
         menu = self.height/2
+        pygame.mixer.music.load('resources/audio/intro.mp3')
+        pygame.mixer.music.play(-1, 0.0)
 
         while not start:  # 초기 화면 설정 (Intro 화면 설정)
             self.stage.blit(self.background, (0, 0))
@@ -70,11 +73,10 @@ class Stage:
                             Cloud(self.stage, self.cloud_list[3], 915, 25, 0)]
             for intro_cloud in intro_clouds:
                 intro_cloud.move()
-            self.text("M2BEAT", TITLE_FONT, (255, 255, 255), self.width/2, self.height/4 + 30)
-            self.text("Start", MENU_FONT, (255, 255, 255), self.width/2, self.height/2)
-            self.text("Exit", MENU_FONT, (255, 255, 255), self.width/2, self.height/2 + 100)
+            self.text("M2BEAT", TITLE_FONT, (0, 0, 0), self.width/2, self.height/4 + 30)
+            self.text("Start", MENU_FONT, (0, 0, 0), self.width/2, self.height/2)
+            self.text("Exit", MENU_FONT, (0, 0, 0), self.width/2, self.height/2 + 100)
             self.text(">", MENU_FONT, (255, 255, 0), self.width/2 - 60, menu)
-            Ground(self.stage, self.ground, 0, self.height - self.ground.get_height())
             self.player.intro()
             pygame.display.update()
             for event in pygame.event.get():
@@ -96,11 +98,13 @@ class Stage:
                     if event.key == pygame.K_SPACE:
                         if menu == self.height/2:
                             start = True
+                            pygame.mixer.music.stop()
                         if menu == self.height/2 + 100:
                             start = True
                             self.finish = True
                             self.exit = True
                             self.playAgain = False
+                            pygame.mixer.music.stop()
 
     def text(self, text, font, color, x, y):  # 텍스트 그리는 함수
         surface = font.render(text, True, color)
@@ -109,8 +113,16 @@ class Stage:
         self.stage.blit(surface, rect)
 
     def update(self):  # 플레이어 움직일 때 잔상 안남게 + 플레이어 움직임
-        self.stage.blit(self.background, (0, 0))
-        Ground(self.stage, self.ground, 0, self.height - self.ground.get_height())
+        self.stage.blit(self.background, (-self.bX, 0))
+        if self.bX > 1:
+            self.stage.blit(self.background, (-(self.bX - 1200), 0))
+        self.bX += SPEED
+        if self.bX >= 1200:
+            self.bX = 0
+        if self.bXtimer == 0:
+            self.bXtimer = 200
+        else:
+            self.bXtimer -= 1
         self.player.move()
         self.cloud_count -= 1
         if self.cloud_count == 0:
@@ -121,9 +133,14 @@ class Stage:
             cloud.move()
         if self.clouds[0].x == -350:
             self.clouds.pop(-(len(self.clouds))-1)
-        self.stage.blit(self.box_img, (850, self.height - self.ground.get_height() - 145))
-        value = self.rhythm.ReturnValue()
-        self.text(value, VALUE_FONT, (255, 255, 0), 890, self.height - self.ground.get_height() - self.value_y)
+        self.stage.blit(self.box_img, (850, self.height - 90 - 145))
+        value_list = self.rhythm.ReturnValue()
+        for value in value_list:
+            # value[0] : Perfect/Great/Good 판정 글자 / value[1] : 글자의 y축 이동
+            self.text(value[0], VALUE_FONT, (102, 102, 255), 880, self.height - self.ground.get_height() - value[1])
+            value[1] += 1
+            if value[1] == 300:
+                value_list.remove(value)
 
     def play(self):
         self.obstacles = []
@@ -142,7 +159,7 @@ class Stage:
             self.update()
             self.player.move()
             if clock.Return() > 0:
-                self.text(str(clock.Return()), COUNT_FONT, (255, 255, 255), self.width / 2, self.height / 2)
+                self.text(str(clock.Return()), COUNT_FONT, (0, 0, 0), self.width / 2, self.height / 2)
             if self.obstacle_count == 0:
                 obstacle = Obstacle(self.stage, self.height, SPEED)
                 self.obstacles.append(obstacle)
@@ -152,41 +169,40 @@ class Stage:
             self.collide.collider()
             self.rhythm.rhythm()
             combo = self.rhythm.ReturnCombo()
-            self.text("COMBO : ", COMBO_FONT, (255, 255, 255), 100, 50)
-            self.text(str(combo), COMBO_FONT, (255, 255, 255), 200, 50)
-            life_count = self.collide.ReturnLife()
+            self.text("COMBO", COMBO_FONT, (0, 0, 0), 1060, 400)
+            self.text(str(combo), COMBO_FONT, (0, 0, 0), 1000, 400)
+            life_count = self.rhythm.ReturnLife()
             if life_count == 3:
-                self.stage.blit(self.life_list[0], (20, 635))
-                self.stage.blit(self.life_list[0], (64, 635))
-                self.stage.blit(self.life_list[0], (108, 635))
+                self.stage.blit(self.life_list[0], (520, 635))
+                self.stage.blit(self.life_list[0], (564, 635))
+                self.stage.blit(self.life_list[0], (608, 635))
             elif life_count == 2:
-                self.stage.blit(self.life_list[0], (20, 635))
-                self.stage.blit(self.life_list[0], (64, 635))
-                self.stage.blit(self.life_list[1], (108, 635))
+                self.stage.blit(self.life_list[0], (520, 635))
+                self.stage.blit(self.life_list[0], (564, 635))
+                self.stage.blit(self.life_list[1], (608, 635))
             elif life_count == 1:
-                self.stage.blit(self.life_list[0], (20, 635))
-                self.stage.blit(self.life_list[1], (64, 635))
-                self.stage.blit(self.life_list[1], (108, 635))
+                self.stage.blit(self.life_list[0], (520, 635))
+                self.stage.blit(self.life_list[1], (564, 635))
+                self.stage.blit(self.life_list[1], (608, 635))
             else:  # 라이프 변수가 0일때 : 게임오버
                 self.finish = True
                 self.collide.init()
                 self.obstacle_count = 270
             self.score = self.rhythm.ReturnScore()
-            self.text("SCORE : ", COMBO_FONT, (255, 255, 255), 600, 50)
-            self.text(str(self.score), COMBO_FONT, (255, 255, 255), 700, 50)
+            self.text("SCORE : ", COMBO_FONT, (0, 0, 0), self.width/2 - 50, 50)
+            self.text(str(self.score), COMBO_FONT, (0, 0, 0), self.width/2 + 50, 50)
             pygame.display.update()
 
     def restart(self):
         choice = self.height/2 + 80
         while self.playAgain:
             self.stage.blit(self.background, (0, 0))
-            Ground(self.stage, self.ground, 0, self.height - self.ground.get_height())
             self.text("GAME OVER", GAMEOVER_FONT, (255, 0, 0), self.width/2, self.height/3)
-            self.text("Replay", MENU_FONT, (255, 255, 255), self.width/2, self.height/2 + 80)
-            self.text("EXIT", MENU_FONT, (255, 255, 255), self.width/2, self.height/2 + 180)
+            self.text("Replay", MENU_FONT, (0, 0, 0), self.width/2, self.height/2 + 80)
+            self.text("EXIT", MENU_FONT, (0, 0, 0), self.width/2, self.height/2 + 180)
             self.text(">", MENU_FONT, (255, 255, 0), self.width/2 - 80, choice)
-            self.text("YOUR SCORE : ", MENU_FONT, (255, 255, 255), self.width/2 - 60, self.height/3 - 100)
-            self.text(str(self.score), MENU_FONT, (255, 255, 255), self.width/2 + 85, self.height/3 - 100)
+            self.text("YOUR SCORE : ", MENU_FONT, (0, 0, 0), self.width/2 - 60, self.height/3 - 100)
+            self.text(str(self.score), MENU_FONT, (0, 0, 0), self.width/2 + 85, self.height/3 - 100)
             pygame.display.update()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

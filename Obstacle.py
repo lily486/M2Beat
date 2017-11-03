@@ -8,11 +8,11 @@ RIGHT = 2
 DOWN = 3
 
 
-class Obstacle:
+class Obstacle(pygame.Rect):
     fireball_img = pygame.image.load('resources/images/Fireball.png')
     oarrow_img = pygame.image.load('resources/images/oarrow.png')
-    lightning_img = pygame.image.load('resources/images/lightning.png')
-    kunai_img = pygame.image.load('resources/images/kunai.png')
+    lightning_img = pygame.image.load('resources/images/lightningResized.png')
+    kunai_img = pygame.image.load('resources/images/kunaiResized.png')
     obstacle_list = [fireball_img, oarrow_img, lightning_img, kunai_img]
     arrow_img = pygame.image.load('resources/images/arrow_resized.png')
     arrow_list = [pygame.transform.rotate(arrow_img, 0),
@@ -24,7 +24,7 @@ class Obstacle:
         self.x = 40  # 장애물의 가로값
         self.y = 40  # 장애물의 세로값
         self.stage = stage
-        self.pos = 280  # 장애물이 처음 생성되는 지점의  x좌표
+        self.pos = 330  # 장애물이 처음 생성되는 지점의  x좌표
         self.y_pos = height - self.y - 86
         self.height = height
         self.speed = speed
@@ -35,7 +35,7 @@ class Obstacle:
 
     def move(self):
         self.pos += self.speed
-        self.stage.blit(self.arrow, (self.pos, self.y_pos - 80))
+        self.stage.blit(self.arrow, (self.pos, self.y_pos - 90))
         self.stage.blit(self.obj, (self.pos, self.y_pos))
         if self.arrow == self.arrow_list[0]:
             self.key = RIGHT

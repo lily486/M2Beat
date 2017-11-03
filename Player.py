@@ -9,7 +9,38 @@ pygame.display.set_mode((1200, 700))
 
 
 class Player(pygame.Rect):
-    def __init__(self, stage, ground,  width, height):
+    slime = Image('resources/images/Slime4.png')  # 슬라임이미지 불러오기
+    warrior_img = Image('resources/images/warrior.png')
+    mage_img = Image('resources/images/mage.png')
+    magician_img = Image('resources/images/magician.png')
+    ninja_img = Image('resources/images/ninja.png')
+
+    walk_frame = [slime.get_image(0, 96, 48, 48),
+                  slime.get_image(48, 96, 48, 48),
+                  slime.get_image(96, 96, 48, 48)]  # 걸어가는 모션(더 추가 가능)
+
+    jump_frame = [slime.get_image(0, 144, 48, 48),
+                  slime.get_image(48, 144, 48, 48),
+                  slime.get_image(96, 144, 48, 48)]  # 점프할때 모션(더 추가 가능)
+
+    warrior1_frame = [warrior_img.get_image(114 * 6, 0, 114, 114),
+                      warrior_img.get_image(114 * 7, 0, 114, 114),
+                      warrior_img.get_image(114 * 8, 0, 114, 114)]
+
+    warrior2_frame = [mage_img.get_image(114 * 6, 0, 114, 114),
+                      mage_img.get_image(114 * 7, 0, 114, 114),
+                      mage_img.get_image(114 * 8, 0, 114, 114)]
+
+    warrior3_frame = [magician_img.get_image(114 * 6, 0, 114, 114),
+                      magician_img.get_image(114 * 7, 0, 114, 114),
+                      magician_img.get_image(114 * 8, 0, 114, 114)]
+
+    warrior4_frame = [ninja_img.get_image(114 * 6, 0, 114, 114),
+                      ninja_img.get_image(114 * 7, 0, 114, 114),
+                      ninja_img.get_image(114 * 8, 0, 114, 114)]
+
+    def __init__(self, stage, width, height):
+        super().__init__(self.walk_frame[0].get_rect())
         self.stage = stage
         self.walking = True  # 계속 움직이는 것처럼 보이게하는 상태
         self.jumping = False  # 점프 유무
@@ -27,38 +58,11 @@ class Player(pygame.Rect):
         self.warrior3 = self.warrior3_frame[0]
         self.warrior4 = self.warrior4_frame[0]
         self.rect = self.image.get_rect()
-        self.pos = vec(955, 1200 - 86 - 48 + 4)  # 플레이어 시작 위치 (가로, 세로(=bottomlimit이랑 일치하게))
+        self.pos = vec(955, 1200 - 90 - 48 + 4)  # 플레이어 시작 위치 (가로, 세로(=bottomlimit이랑 일치하게))
         self.x = 250  # intro 화면에서 사용하는 x좌표
         self.vel = vec(0, 0)  # 속도계산
         self.acc = vec(0, 0)  # 가속계산
-        self.ground_height = ground.get_height()
-
-    slime = Image('resources/images/Slime4.png')  # 슬라임이미지 불러오기
-    warrior_img = Image('resources/images/warrior_partyResized.png')
-
-    walk_frame = [slime.get_image(0, 96, 48, 48),
-                  slime.get_image(48, 96, 48, 48),
-                  slime.get_image(96, 96, 48, 48)]  # 걸어가는 모션(더 추가 가능)
-
-    jump_frame = [slime.get_image(0, 144, 48, 48),
-                  slime.get_image(48, 144, 48, 48),
-                  slime.get_image(96, 144, 48, 48)]  # 점프할때 모션(더 추가 가능)
-
-    warrior1_frame = [warrior_img.get_image(510, 170 + 2, 85, 85),
-                      warrior_img.get_image(595, 170 + 2, 85, 85),
-                      warrior_img.get_image(680, 170 + 2, 85, 85)]
-
-    warrior2_frame = [warrior_img.get_image(765, 170 + 2, 85, 85),
-                      warrior_img.get_image(850, 170 + 2, 85, 85),
-                      warrior_img.get_image(935, 170 + 2, 85, 85)]
-
-    warrior3_frame = [warrior_img.get_image(0, 510 + 2, 85, 85),
-                      warrior_img.get_image(85, 510 + 2, 85, 85),
-                      warrior_img.get_image(170, 510 + 2, 85, 85)]
-
-    warrior4_frame = [warrior_img.get_image(255, 510 + 2, 85, 85),
-                      warrior_img.get_image(340, 510 + 2, 85, 85),
-                      warrior_img.get_image(425, 510 + 2, 85, 85)]
+        self.ground_height = 90
 
     def jump(self):
         self.vel.y = -10
@@ -121,20 +125,20 @@ class Player(pygame.Rect):
         self.rect.midbottom = self.pos
 
         self.stage.blit(self.image, (self.pos.x, self.pos.y))
-        self.stage.blit(self.warrior1, (250, self.height - self.ground_height - self.warrior1.get_height() + 1))
-        self.stage.blit(self.warrior2, (200, self.height - self.ground_height - self.warrior2.get_height() + 1))
-        self.stage.blit(self.warrior3, (150, self.height - self.ground_height - self.warrior3.get_height() + 1))
-        self.stage.blit(self.warrior4, (100, self.height - self.ground_height - self.warrior4.get_height() + 1))
+        self.stage.blit(self.warrior1, (260, self.height - self.ground_height - self.warrior1.get_height() + 1))
+        self.stage.blit(self.warrior2, (190, self.height - self.ground_height - self.warrior2.get_height() + 1))
+        self.stage.blit(self.warrior3, (120, self.height - self.ground_height - self.warrior3.get_height() + 1))
+        self.stage.blit(self.warrior4, (50, self.height - self.ground_height - self.warrior4.get_height() + 1))
 
     def intro(self):
         self.animate()
         bottomlimit = self.height - self.ground_height - self.image.get_height()
-        if self.x < self.width + 300:
+        if self.x < self.width + 460:
             self.stage.blit(self.image, (self.x, bottomlimit + 4))
-            self.stage.blit(self.warrior1, (self.x - 150, self.height - self.ground_height - self.warrior1.get_height() + 1))
-            self.stage.blit(self.warrior2, (self.x - 200, self.height - self.ground_height - self.warrior2.get_height() + 1))
-            self.stage.blit(self.warrior3, (self.x - 250, self.height - self.ground_height - self.warrior3.get_height() + 1))
-            self.stage.blit(self.warrior4, (self.x - 300, self.height - self.ground_height - self.warrior4.get_height() + 1))
+            self.stage.blit(self.warrior1, (self.x - 300, self.height - self.ground_height - self.warrior1.get_height() + 1))
+            self.stage.blit(self.warrior2, (self.x - 370, self.height - self.ground_height - self.warrior2.get_height() + 1))
+            self.stage.blit(self.warrior3, (self.x - 440, self.height - self.ground_height - self.warrior3.get_height() + 1))
+            self.stage.blit(self.warrior4, (self.x - 510, self.height - self.ground_height - self.warrior4.get_height() + 1))
             self.x += 3
         else:
             self.x = 0
