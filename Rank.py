@@ -24,7 +24,4 @@ class Rank:
         self.rank = f.read()
         self.rank.split("\n")
         f.close()
-        f = open('C:\Rank.txt', 'w')
-        f.write(self.rank)
-        f.close()
         return self.rank
