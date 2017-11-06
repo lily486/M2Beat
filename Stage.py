@@ -6,6 +6,9 @@ from Timer import Timer
 from Obstacle import Obstacle
 from Collide import Collide
 from Rhythm import Rhythm
+from Rank import Rank
+
+
 pygame.font.init()
 JUMP_LIMIT = 2  # 점프 한도
 
@@ -57,6 +60,7 @@ class Stage:
         self.score = 0
         self.bX = 1200
         self.bXtimer = 200
+        self.Rank = Rank()
 
     def menu_choice(self):
         start = False
@@ -195,6 +199,8 @@ class Stage:
 
     def restart(self):
         choice = self.height/2 + 80
+        self.Rank.writing(str(self.score))
+        self.Rank.reading()
         while self.playAgain:
             self.stage.blit(self.background, (0, 0))
             self.text("GAME OVER", GAMEOVER_FONT, (255, 0, 0), self.width/2, self.height/3)

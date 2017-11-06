@@ -1,25 +1,30 @@
 import pygame
 import sys
-from Rhythm import Rhythm
+import locale
+import functools
+
 
 class Rank:
-    Rank_file = open('C:\Rank.txt', 'w')
+
 
     def __init__(self,):
-        self.option = sys.argv[1]
         self.rank = []
 
+    def lensort(self, ):
+        pass
 
     def writing(self, score):
-        self.option == '-a'
-        score = sys.argv[2]
         f = open('C:\Rank.txt', 'a')
         f.write(score)
         f.write('\n')
         f.close()
 
     def reading(self):
-        f = open('C:\Rank.txt', 'v')
+        f = open('C:\Rank.txt', 'r')
         self.rank = f.read()
+        self.rank.split("\n")
+        f.close()
+        f = open('C:\Rank.txt', 'w')
+        f.write(self.rank)
         f.close()
         return self.rank
