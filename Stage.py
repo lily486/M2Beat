@@ -233,7 +233,8 @@ class Stage:
                         if not len(name) == 0:
                             name.pop()
                     if event.key == pygame.K_INSERT and not inputDone:
-                        score_list = [self.score, name]
+                        namae = "".join(name)
+                        score_list = [self.score, namae]
                         self.Rank.writing(str(score_list))
                         self.Rank.reading()
                         inputDone = True

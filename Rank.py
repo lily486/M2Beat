@@ -1,10 +1,10 @@
-import pygame
-import sys
+from operator import itemgetter
 import locale
 import functools
 
 
 class Rank:
+    locale.setlocale(locale.LC_ALL, '')
 
     def __init__(self,):
         self.rank = []
@@ -20,7 +20,10 @@ class Rank:
 
     def reading(self):
         f = open('Rank.txt', 'r')
-        self.rank = f.read()
-        self.rank.split("\n")
+        self.rank = f.readlines()
         f.close()
-        return self.rank
+        b = sorted(self.rank, key=lambda x: int(x.split(",")[0][1:]), reverse=True)
+        a = "".join(b)
+        f = open('Rank.txt', 'w')
+        f.write(a)
+        f.close()
