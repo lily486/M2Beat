@@ -20,7 +20,7 @@ GAMEOVER_FONT = pygame.font.Font('resources/fonts/grishenko_novoye_nbp.ttf', 60)
 VALUE_FONT = pygame.font.Font('resources/fonts/grishenko_novoye_nbp.ttf', 25)
 
 SPEED = 3  # 배경(구름), 장애물 움직이는 속도
-
+ENTER = 13  # 엔터 키코드 (ASCII)
 
 class Stage:
     width = 1200  # 가로
@@ -99,7 +99,7 @@ class Stage:
                 if menu < self.height/2:
                     menu = self.height/2
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
+                    if event.key == ENTER:
                         if menu == self.height/2:
                             start = True
                             pygame.mixer.music.stop()
@@ -199,8 +199,8 @@ class Stage:
 
     def restart(self):
         choice = self.height/2 + 80
-        self.Rank.writing(str(self.score))
-        self.Rank.reading()
+        name = []
+        inputDone = False
         while self.playAgain:
             self.stage.blit(self.background, (0, 0))
             self.text("GAME OVER", GAMEOVER_FONT, (255, 0, 0), self.width/2, self.height/3)
@@ -209,6 +209,14 @@ class Stage:
             self.text(">", MENU_FONT, (255, 255, 0), self.width/2 - 80, choice)
             self.text("YOUR SCORE : ", MENU_FONT, (0, 0, 0), self.width/2 - 60, self.height/3 - 100)
             self.text(str(self.score), MENU_FONT, (0, 0, 0), self.width/2 + 85, self.height/3 - 100)
+            self.text("YOUR NAME : ", MENU_FONT, (0, 0, 0), self.width/2 - 60, self.height/3 - 150)
+            if len(name) != 0:
+                name_x = self.width/2 + 65
+                for i in name:
+                    self.text(i, MENU_FONT, (0, 0, 0), name_x, self.height/3 - 150)
+                    name_x += 20
+            if inputDone:
+                self.text("INPUT IS DONE !", VALUE_FONT, (255, 0, 0), self.width/2, self.height/2 + 20)
             pygame.display.update()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -218,12 +226,23 @@ class Stage:
                         choice += 100
                     if event.key == pygame.K_UP:
                         choice -= 100
+                    if event.unicode.isalpha():
+                        if not len(name) == 3:
+                            name.append(event.unicode.upper())
+                    if event.key == pygame.K_BACKSPACE:
+                        if not len(name) == 0:
+                            name.pop()
+                    if event.key == pygame.K_INSERT and not inputDone:
+                        score_list = [self.score, name]
+                        self.Rank.writing(str(score_list))
+                        self.Rank.reading()
+                        inputDone = True
                 if choice > self.height/2 + 180:  # 두가지 메뉴에서 벗어나지 않게 / 부등호 뒤에 EXIT 의 y 좌표
                     choice = self.height/2 + 180
                 if choice < self.height/2 + 80:  # 부등호 뒤에 Replay 의 y 좌표
                     choice = self.height/2 + 80
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
+                    if event.key == ENTER:
                         if choice == self.height/2 + 80:
                             self.finish = False
                             self.playAgain = False
