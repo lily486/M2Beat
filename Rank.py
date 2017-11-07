@@ -1,16 +1,7 @@
-from operator import itemgetter
-import locale
-import functools
-
-
 class Rank:
-    locale.setlocale(locale.LC_ALL, '')
 
     def __init__(self,):
         self.rank = []
-
-    def lensort(self, ):
-        pass
 
     def writing(self, score):
         f = open('Rank.txt', 'a')
