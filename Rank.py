@@ -1,8 +1,3 @@
-from operator import itemgetter
-import locale
-import functools
-
-
 class Rank:
     locale.setlocale(locale.LC_ALL, '')
 
