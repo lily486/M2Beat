@@ -22,6 +22,7 @@ VALUE_FONT = pygame.font.Font('resources/fonts/grishenko_novoye_nbp.ttf', 25)
 SPEED = 3  # 배경(구름), 장애물 움직이는 속도
 ENTER = 13  # 엔터 키코드 (ASCII)
 
+
 class Stage:
     width = 1200  # 가로
     height = 700  # 세로
@@ -50,7 +51,6 @@ class Stage:
         self.player = Player(self.stage, self.width, self.height)
         self.count = 0  # 점프한 횟수(K_UP 누른 횟수)
         self.cloud_count = 1
-        self.obstacle_count = 275
         self.clouds = []
         self.intro_clouds = []
         self.obstacles = []
@@ -61,6 +61,7 @@ class Stage:
         self.bX = 1200
         self.bXtimer = 200
         self.Rank = Rank()
+        self.obstacle_value = False
 
     def menu_choice(self):
         start = False
@@ -147,27 +148,30 @@ class Stage:
                 value_list.remove(value)
 
     def play(self):
-        self.obstacles = []
+        pygame.mixer.music.load('resources/audio/bgm.mp3')
+        pygame.mixer.music.play(-1, 0.0)
+        pygame.mixer.music.pause()
         self.collide = Collide(self.player, self.obstacles, self.stage)
-        self.rhythm = Rhythm(self.obstacles, self.stage)
         self.playAgain = True
-        clock = Timer(6, self.finish)  # 시작하기 전 5초 세기 (몇 초 셀건지 바꾸려면 +1 해서 설정)
+        clock = Timer(6, self.finish, self.stage, self.height)  # 시작하기 전 5초 세기 (몇 초 셀건지 바꾸려면 +1 해서 설정)
         clock.timer()
+        clock.rhythm()
+        clock.init()
+        self.obstacles = clock.ReturnObj()
+        self.rhythm = Rhythm(self.obstacles, self.stage)
         while not self.finish:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.finish = True
                     self.exit = True
                     self.playAgain = False
-            self.obstacle_count -= 1
+                    pygame.mixer.music.stop()
+
             self.update()
             self.player.move()
             if clock.Return() > 0:
                 self.text(str(clock.Return()), COUNT_FONT, (0, 0, 0), self.width / 2, self.height / 2)
-            if self.obstacle_count == 0:
-                obstacle = Obstacle(self.stage, self.height, SPEED)
-                self.obstacles.append(obstacle)
-                self.obstacle_count = random.randint(20, 80)
+
             for obj in self.obstacles:
                 obj.move()
             self.collide.collider()
@@ -191,7 +195,8 @@ class Stage:
             else:  # 라이프 변수가 0일때 : 게임오버
                 self.finish = True
                 self.collide.init()
-                self.obstacle_count = 270
+                pygame.mixer.music.stop()
+                clock.init()
             self.score = self.rhythm.ReturnScore()
             self.text("SCORE : ", COMBO_FONT, (0, 0, 0), self.width/2 - 50, 50)
             self.text(str(self.score), COMBO_FONT, (0, 0, 0), self.width/2 + 50, 50)
