@@ -166,7 +166,6 @@ class Stage:
                     self.exit = True
                     self.playAgain = False
                     pygame.mixer.music.stop()
-
             self.update()
             self.player.move()
             if clock.Return() > 0:
@@ -196,6 +195,7 @@ class Stage:
                 self.finish = True
                 self.collide.init()
                 pygame.mixer.music.stop()
+                clock.Stop()
                 clock.init()
             self.score = self.rhythm.ReturnScore()
             self.text("SCORE : ", COMBO_FONT, (0, 0, 0), self.width/2 - 50, 50)

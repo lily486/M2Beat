@@ -117,7 +117,7 @@ class Player(pygame.Rect):
                     self.jumping = False
             if move.type == pygame.KEYDOWN:
                 if move.key == pygame.K_UP and self.jump_count < JUMP_LIMIT:
-                    self.jump()
+                    pass
                 elif move.key == pygame.K_RIGHT:
                     pass
                 elif move.key == pygame.K_LEFT:
